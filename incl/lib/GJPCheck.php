@@ -46,8 +46,6 @@ class GJPCheck {
 	 * @return     The account id
 	 */
 	public static function getAccountIDOrDie(){
-		require_once "../lib/exploitPatch.php";
-		
 		$gs = new mainLib();
 		$udid = $gs->getUDID();
 		$userInfo = $db->prepare("SELECT userID FROM users WHERE extID = :udid");

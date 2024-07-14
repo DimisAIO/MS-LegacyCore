@@ -5,11 +5,16 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
-if(!isset($_POST['itemID']))
-	exit(-1);
+if(!isset($_POST['itemID']) || !isset(['levelID']))
+	exit("-1");
+
+// make it work with likeGJLevel.php
+
+if(!empty($_POST["itemID"])) $itemID = ExploitPatch::remove($_POST['itemID']);
+elseif(!empty($_POST["levelID"])) $itemID = ExploitPatch::remove($_POST['levelID']);
+else exit("-1");
 
 $type = isset($_POST['type']) ? $_POST['type'] : 1;
-$itemID = ExploitPatch::remove($_POST['itemID']);
 $isLike = isset($_POST['like']) ? $_POST['like'] : 1;
 $ip = $gs->getIP();
 
