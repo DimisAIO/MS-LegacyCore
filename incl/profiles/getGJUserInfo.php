@@ -27,11 +27,30 @@ $creatorpoints = round($user["creatorPoints"], PHP_ROUND_HALF_DOWN);
 $e = "SET @rownum := 0;";
 $query = $db->prepare($e);
 $query->execute();
-/*$f = "SELECT rank FROM (
-                  SELECT @rownum := @rownum + 1 AS rank, extID
-                  FROM users WHERE isBanned = '0' AND gameVersion > 19 AND stars > 25 ORDER BY stars DESC
-                  ) as result WHERE extID=:extid";*/
-$f = "SELECT count(*) FROM users WHERE stars > :stars"; //I can do this, since I already know the stars amount beforehand
+$bans = $gs->getAllBansOfBanType(0);
+$extIDs = $userIDs = $bannedIPs = [];
+foreach($bans AS &$ban) {
+	switch($ban['personType']) {
+		case 0:
+			$extIDs[] = $ban['person'];
+			break;
+		case 1:
+			$userIDs[] = $ban['person'];
+			break;
+		case 2:
+			$bannedIPs[] = $gs->IPForBan($ban['person'], true);
+			break;
+	}
+}
+$extIDsString = "'".implode("','", $extIDs)."'";
+$userIDsString = "'".implode("','", $userIDs)."'";
+$bannedIPsString = implode("|", $bannedIPs);
+$queryArray = [];
+if($extIDsString != '') $queryArray[] = "extID NOT IN (".$extIDsString.")";
+if($userIDsString != '') $queryArray[] = "userID NOT IN (".$userIDsString.")";
+if(!empty($bannedIPsString)) $queryArray[] = "IP NOT REGEXP '".$bannedIPsString."'";
+$queryText = !empty($queryArray) ? '('.implode(' AND ', $queryArray).') AND' : '';
+$f = "SELECT count(*) FROM users WHERE ".$queryText." stars > :stars";
 $query = $db->prepare($f);
 $query->execute([':stars' => $user["stars"]]);
 if($query->rowCount() > 0) $rank = $query->fetchColumn() + 1;
