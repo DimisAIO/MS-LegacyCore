@@ -1,8 +1,8 @@
 # LegacyCore - WIP (Work in Progress)
-## Geometry Dash Private Server
+## GD Comeback's Core
 Basically a Geometry Dash Server Emulator
 
-Supported version of Geometry Dash: 1.0 - 2.206 (Unregistered accounts only!)
+Supports 1.2 only
 
 (See [the backwards compatibility section of this article](https://github.com/Cvolton/GMDprivateServer/wiki/Deliberate-differences-from-real-GD) for more information)
 
