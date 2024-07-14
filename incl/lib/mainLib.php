@@ -1,6 +1,13 @@
 <?php
 include_once __DIR__ . "/ip_in_range.php";
 class mainLib {
+
+	public function getUDID() {
+		require_once "exploitPatch.php";
+		$udid = isset($_POST['udid']) && !empty($_POST['udid']) ? ExploitPatch::remove($_POST["udid"]) : exit("-1");
+		return is_numeric($udid) ? $udid : exit("-1"); 
+	}
+
 	public function getAudioTrack($id) {
 		$songs = ["Stereo Madness by ForeverBound",
 			"Back on Track by DJVI",
@@ -47,90 +54,58 @@ class mainLib {
 		return $songs[$id];
 	}
 	public function getDifficulty($diff, $auto, $demon, $demonDiff = 1) {
-		if($auto != 0) return "Auto";
-		if($demon != 0) {
-			switch($demonDiff) {
-				case 0:
-					return 'Hard Demon';
-					break;
-				case 3:
-					return 'Easy Demon';
-					break;
-				case 4:
-					return 'Medium Demon';
-					break;
-				case 5:
-					return 'Insane Demon';
-					break;
-				case 6:
-					return 'Extreme Demon';
-					break;
-				default:
-					return 'Demon';
-					break;
-			}
-		} else {
-			switch($diff) {
-				case 0:
-					return "N/A";
-					break;
-				case 10:
-					return "Easy";
-					break;
-				case 20:
-					return "Normal";
-					break;
-				case 30:
-					return "Hard";
-					break;
-				case 40:
-					return "Harder";
-					break;
-				case 50:
-					return "Insane";
-					break;
-				default:
-					return "Unknown";
-					break;
-			}
+		switch($diff) {
+			case 0:
+				return "N/A";
+				break;
+			case 10:
+				return "Easy";
+				break;
+			case 20:
+				return "Normal";
+				break;
+			case 30:
+				return "Hard";
+				break;
+			case 40:
+				return "Harder";
+				break;
+			case 50:
+				return "Insane";
+				break;
+			default:
+				return "Unknown";
+				break;
 		}
 	}
 	public function getDiffFromStars($stars) {
-		$auto = 0;
-		$demon = 0;
+		/*
+			1 -> Easy
+			2 -> Normal
+			3 -> Hard
+			4 -> Harder
+			5 -> Insane
+		*/
 		switch($stars){
 			case 1:
-				$diffname = "Auto";
-				$diff = 50;
-				$auto = 1;
-				break;
-			case 2:
 				$diffname = "Easy";
 				$diff = 10;
 				break;
-			case 3:
+			case 2:
 				$diffname = "Normal";
 				$diff = 20;
 				break;
-			case 4:
-			case 5:
+			case 3:
 				$diffname = "Hard";
 				$diff = 30;
 				break;
-			case 6:
-			case 7:
+			case 4:
 				$diffname = "Harder";
 				$diff = 40;
 				break;
-			case 8:
-			case 9:
+			case 5:
 				$diffname = "Insane";
 				$diff = 50;
-				break;
-			case 10:
-				$diffname = "Demon";
-				$diff = 50;
-				$demon = 1;
 				break;
 			default:
 				$diffname = "N/A";
@@ -213,8 +188,6 @@ class mainLib {
 	}
 	public function getDiffFromName($name) {
 		$name = strtolower($name);
-		$starAuto = 0;
-		$starDemon = 0;
 		switch ($name) {
 			default:
 				$starDifficulty = 0;
@@ -234,27 +207,10 @@ class mainLib {
 			case "insane":
 				$starDifficulty = 50;
 				break;
-			case "auto":
-				$starDifficulty = 50;
-				$starAuto = 1;
-				break;
-			case "demon":
-				$starDifficulty = 50;
-				$starDemon = 1;
-				break;
 		}
-		return array($starDifficulty, $starDemon, $starAuto);
+		return array($starDifficulty, 0, 0);
 	}
-	public function getGauntletName($id, $wholeArray = false){
-		$gauntlets = ["Unknown", "Fire", "Ice", "Poison", "Shadow", "Lava", "Bonus", "Chaos", "Demon", "Time", "Crystal", "Magic", "Spike", "Monster", "Doom", "Death", 'Forest', 'Rune', 'Force', 'Spooky', 'Dragon', 'Water', 'Haunted', 'Acid', 'Witch', 'Power', 'Potion', 'Snake', 'Toxic', 'Halloween', 'Treasure', 'Ghost', 'Spider', 'Gem', 'Inferno', 'Portal', 'Strange', 'Fantasy', 'Christmas', 'Surprise', 'Mystery', 'Cursed', 'Cyborg', 'Castle', 'Grave', 'Temple', 'World', 'Galaxy', 'Universe', 'Discord', 'Split', 'NCS I', 'NCS II'];
-		if($wholeArray) return $gauntlets;
-		if($id < 0 || $id >= count($gauntlets))
-			return $gauntlets[0];
-		return $gauntlets[$id];
-	}
-	public function getGauntletCount() {
-		return count($this->getGauntletName(0, true))-1;
-	}
+
 	public function makeTime($time) {
 		include __DIR__ . "/../../config/dashboard.php";
 		if(!isset($timeType)) $timeType = 0;
@@ -281,23 +237,11 @@ class mainLib {
 		}
 	}
 	public function getIDFromPost() {
-		include __DIR__ . "/../../config/security.php";
-		include_once __DIR__ . "/exploitPatch.php";
-		include_once __DIR__ . "/GJPCheck.php";
-		if(!empty($_POST["udid"]) AND $_POST['gameVersion'] < 20 AND $unregisteredSubmissions) {
-			$id = ExploitPatch::remove($_POST["udid"]);
-			if(is_numeric($id)) exit("-1");
-		} elseif(!empty($_POST["accountID"]) AND $_POST["accountID"] !="0") $id = GJPCheck::getAccountIDOrDie();
-		else exit("-1");
-		return $id;
+		return getUDID(); // function redirect :)
 	}
 	public function getUserID($extID, $userName = "Undefined") {
 		include __DIR__ . "/connection.php";
-		if(is_numeric($extID)){
-			$register = 1;
-		}else{
-			$register = 0;
-		}
+		$register = 0; // no way it's gonna be 1
 		$query = $db->prepare("SELECT userID FROM users WHERE extID LIKE BINARY :id");
 		$query->execute([':id' => $extID]);
 		if ($query->rowCount() > 0) {

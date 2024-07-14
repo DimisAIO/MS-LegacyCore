@@ -41,22 +41,23 @@ class GJPCheck {
 	}
 
 	/**
-	 * Gets accountID and from the POST parameters and validates if the provided GJP matches
+	 * Gets accountID from the UDID in POST parameters.
 	 *
 	 * @return     The account id
 	 */
 	public static function getAccountIDOrDie(){
 		require_once "../lib/exploitPatch.php";
 		
-		if(empty($_POST['accountID'])) exit("-1");
+		$gs = new mainLib();
+		$udid = $gs->getUDID();
+		$userInfo = $db->prepare("SELECT userID FROM users WHERE extID = :udid");
+		$userInfo->execute([':udid' => $udid]);
+		if($userInfo->rowCount() == 0) {
+			exit("-1");
+		}
 
-		$accountID = ExploitPatch::remove($_POST["accountID"]);
-
-		if(!empty($_POST['gjp'])) self::validateGJPOrDie($_POST['gjp'], $accountID);
-		elseif(!empty($_POST['gjp2'])) self::validateGJP2OrDie($_POST['gjp2'], $accountID);
-		else exit("-1");
-
-		return $accountID;
+		$row = $userInfo->fetch(PDO::FETCH_ASSOC);
+		return $row['userID'];
 	}
 }
 ?>
