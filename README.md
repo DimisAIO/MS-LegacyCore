@@ -4,6 +4,11 @@ Basically a Geometry Dash Server Emulator
 
 Supports 1.2 (tested) 
 
+To do:
+
+1. Implement 1.2 endpoints (I guess)
+2. Make an "accounts" system (for dashboard)
+
 Required version of PHP: 5.5+ (tested up to 8.3)
 
 ### Credits
