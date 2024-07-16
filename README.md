@@ -1,3 +1,7 @@
+# Archived
+Using MegaSa1nt's core might be difficult because of the dashboard's implementation...
+[Try 2](https://github.com/DimisAIO/LegacyCore)
+
 # LegacyCore - WIP (Work in Progress)
 ## GD Comeback's Core
 Basically a Geometry Dash Server Emulator
